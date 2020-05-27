@@ -78,7 +78,7 @@ void filter(int x)  // x is the input from adc
     { 
         for (int i =0 ; i<N ; i++)
         {
-            y[i] = z[(oldest_input+1)%N] 
+            y[i] = z[(oldest_input+i)%N] 
         }
 
         for (n= 0 ; n< last_input ;  n++)  // idx =1
