@@ -13,8 +13,14 @@ sbit ADDC=P0^2;
 
 int result, ADC_value;
 int i =0;
+//filtration constants
+int last_input =-1 ; // initial state flag
+int oldest_input = 0 ;
+
+
 //target is lowpass 150hz, high pass 1hz,notch filter at 50hz
 float coeff[5]= {0.2397,0.02625,0.02704,0.02785,0.02837}; 
+
 void delay(unsigned int count) 
 {
     int i,j;
@@ -23,40 +29,30 @@ void delay(unsigned int count)
 }
 
    
-// void filter(int n)
-// {
-// 	if (i<n)
-// 	{
-// 		//multiply by coefficeint and store it in result 
-// 		result+=255*coeff[i]*ADC_value;
-// 		i++;
-// 	}
-// 	else
-// 		DAC_port= result;
-// }
-
-   
 void filter(int x)  // x is the input from adc
-{   static const in N = 5 ;
+{   
+	static const int N = 5 ;
     static int z[N] ; // static 3lshan b3d m y5ls elfunction de w yrg3lha tany yrg3 yla2y el array fe a5r values
-    static int last_input =-1 ; // initial state flag
-    int oldest_input = 0 ;
     bool full = false;
     int n ;
-    int result = 0 ;
-    int oldest_input = 0 ;
+	result = 0 ;
     int y[N] ;
 
-    if (last_input == -1 ) {
+    if (last_input == -1 )
+     	{
         for (n=0 ; n<N ;n++)
-            z[n] = 0 ;
+            z[n] = 0 ; // SET ALL elements TO ZERO
+        
         last_input = 0 ; //reset      
-    }
+    	}
+
     z[last_input] = x ; 
+
     if ((last_input +1) % N )==0
-        {   full = true ; 
-            last_input = 0 ;
-            oldest_input = (last_input+N) % N +1 ;
+    	{  
+        full = true ; 
+        last_input = 0 ;
+        oldest_input = (last_input+N) % N +1 ;
 
         }
     else 
@@ -65,26 +61,23 @@ void filter(int x)  // x is the input from adc
      // circular buffer pointer ----> last einputut entry location
     if (!full)  
     {
-
-    for (n= 0 ; n< last_input ;  n++)  // idx =1
-    {                                  
+	    for (n= 0 ; n< last_input ;  n++)  // idx =1
+    	{                                  
             result += z[n] * coeff[ abs( n-(N-1) ) ] * 255 ;
-    }           
-    
-    
+    	}          
     }
       
     else
     { 
         for (int i =0 ; i<N ; i++)
         {
-            y[i] = z[(oldest_input+i)%N] 
+            y[i] = z[(oldest_input+i)%N];
         }
 
         for (n= 0 ; n< last_input ;  n++)  // idx =1
-    {                                  
+    	{                                  
             result += y[n] * coeff[ abs( n-(N-1) ) ] * 255 ;
-    }    
+	    }    
 
 	}
 	DAC_port= result;
