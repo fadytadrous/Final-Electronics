@@ -23,18 +23,47 @@ void delay(unsigned int count)
 }
 
    
-void filter(int n)
-{
-	if (i<n)
-	{
-		//multiply by coefficeint and store it in result 
-		result+=255*coeff[i]*ADC_value;
-		i++;
-	}
-	else
-		DAC_port= result;
+// void filter(int n)
+// {
+// 	if (i<n)
+// 	{
+// 		//multiply by coefficeint and store it in result 
+// 		result+=255*coeff[i]*ADC_value;
+// 		i++;
+// 	}
+// 	else
+// 		DAC_port= result;
+// }
+
+   
+void filter(int x)  // x is the input from adc
+{   static const in N = 5 ;
+    static int z[N] ; // static 3lshan b3d m y5ls elfunction de w yrg3lha tany yrg3 yla2y el array fe a5r values
+    static int last_input =-1 ; // initial state flag
+    int oldest_input = 0 ;
+
+    int n ;
+    int result = 0 ;
+    int oldest_input = 0 ;
+
+
+    if (last_input == -1 ) {
+        for (n=0 ; n<M ;n++)
+            z[n] = 0 ;
+        last_input = 0 ; //reset 
+        
+    }
+    oldest_input = (last_input+N) % N +1 ;
+    z[last_input] = x ; 
+    last_input =  (last_input +1) % N ; // circular buffer pointer ----> last einputut entry location
+    for (n= oldest_input ; n< last_input ;  n++)  // idx =1
+    {                                   
+        result += z[n] * coeff[ abs( n-(N-1) ) ] * 255 ;
+    }
+	
+	DAC_port= result;
 }
- 
+
 
 void read_adc() //Function to drive ADC
 {
