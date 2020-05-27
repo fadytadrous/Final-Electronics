@@ -11,10 +11,10 @@ sbit ADDC=P0^2;
 #define Adc_Data P2  //ADC
 #define DAC_port P3  //DAC
 
-int result[4], ADC_value;
+int result, ADC_value;
 int i =0;
 //target is lowpass 150hz, high pass 1hz,notch filter at 50hz
-
+float coeff[5]= {0.2397,0.02625,0.02704,0.02785,0.02837}; 
 void delay(unsigned int count) 
 {
     int i,j;
@@ -22,7 +22,19 @@ void delay(unsigned int count)
     for(j=0;j<100;j++);
 }
 
-
+   
+void filter(int n)
+{
+	if (i<n)
+	{
+		//multiply by coefficeint and store it in result 
+		result+=255*coeff[i]*ADC_value;
+		i++;
+	}
+	else
+		DAC_port= result;
+}
+ 
 
 void read_adc() //Function to drive ADC
 {
@@ -36,23 +48,11 @@ void read_adc() //Function to drive ADC
     while(EOC==0);
     OE=1;
     ADC_value = Adc_Data;
-    DAC_port = ADC_value; 
+   // DAC_port = ADC_value; 
+    filter(5);
     delay(1);
     OE=0;
 }
-void filter(int n)
-{
-	if (i<=n)
-	{
-		//multiply by cooeficeint and store it in result 
-		result[i]=ADC_value;
-		i++;
-	}
-	else
-		P3= result;
-
-}
- 
 void adc() 
 {
     ADDC=0; // Selecting input channel IN0 using address lines
