@@ -86,6 +86,7 @@ void filter(int x)  // x is the input from adc
 	    }    
 
 	}
+    result = (result>>4) ; // take Higher 4 bits i.e shifting to right , 
 	DAC_port= result;
 }
 
@@ -101,9 +102,9 @@ void read_adc() //Function to drive ADC
     while(EOC==1);
     while(EOC==0);
     OE=1;
-    ADC_value = Adc_Data;
-   // DAC_port = ADC_value; 
-    filter(5);
+    ADC_value = Adc_Data;  // momken nshel el variable da malhosh lazma kda , nst5dm  Adc_Data 3la tool 
+   
+    filter(ADC_value);  // or ------> filter(Adc_Data); // I think this is a little bit faster , we will save variable assignment operation 
     delay(1);
     OE=0;
 }
