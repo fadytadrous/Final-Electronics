@@ -62,7 +62,13 @@ void filter(int x)  // x is the input from adc
 
         }
     else 
+        {
+
         last_input = (last_input +1) % N ;
+         
+                 
+        
+        }
     
      // circular buffer pointer ----> last einputut entry location
     if (!full)  
@@ -79,6 +85,7 @@ void filter(int x)  // x is the input from adc
         {
             y[i] = z[(oldest_input+i)%N];
         }
+        oldest_input = (oldest_input+1)%N ;
 
         for (n= 0 ; n< last_input ;  n++)  // idx =1
     	{                                  
