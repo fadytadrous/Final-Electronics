@@ -80,6 +80,7 @@ void filter(int x)  // x is the input from adc
 	    }    
 
 	}
+    result = (result>>4) ; // take Higher 4 bits i.e shifting to right , 
 	DAC_port= result;
 }
 
