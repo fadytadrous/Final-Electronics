@@ -28,7 +28,13 @@ void delay(unsigned int count)
     for(j=0;j<100;j++);
 }
 
-   
+int abs(int i)
+{
+	if (i <0) 
+		return -i;
+	else
+		return i;
+}
 void filter(int x)  // x is the input from adc
 {   
 	static const int N = 5 ;
@@ -48,7 +54,7 @@ void filter(int x)  // x is the input from adc
 
     z[last_input] = x ; 
 
-    if ((last_input +1) % N )==0
+    if (((last_input +1) % N )==0)
     	{  
         full = true ; 
         last_input = 0 ;
