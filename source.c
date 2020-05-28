@@ -11,12 +11,11 @@ sbit ADDC=P0^2;
 #define Adc_Data P2  //ADC
 #define DAC_port P3  //DAC
 
-int result, ADC_value;
 //filtration constants
 // int last_input =-1 ; // initial state flag
 // int oldest_input = 0 ;
 int testarray[5]={0};
-int i =0;
+unsigned char i =0;
 
 
 //target is lowpass 150hz, high pass 1hz,notch filter at 50hz
@@ -24,40 +23,34 @@ float coeff[5]= {0.2397,0.02625,0.02704,0.02785,0.02837};
 
 void delay(unsigned int count) 
 {
-    int i,j;
+    unsigned char i,j;
     for(i=0;i<count;i++)
     for(j=0;j<100;j++);
 }
 
-int abs(int i)
-{
-	if (i <0) 
-		return -i;
-	else
-		return i;
-}
 void Filter(int x)
 {
-	static const int N = 5 ;
-	result=0;
+	static const unsigned char N = 5 ;
+	unsigned char n;
+	int result=0; 
 	if(i<N)
 	{
 		testarray[i]= x;  
 		i++;
 	}
 	else{
-		testarray[0]=0;
-		for (int m = 0; m < N-1; m++)
+		for ( n = 0; n < (N-1); n++)
 		{
-			testarray[m] = testarray[m+1];
+			testarray[n] = testarray[n+1]; //shift w 7otkol value fi ely ganbha
 		}
 		testarray[N-1] = x;
 	}
-	for (int n= 0 ; n< N ;  n++)  // idx =1
-    	{                                  
-            result += testarray[n] * coeff[ abs( n-(N-1) ) ] * 255 ;
+	for (n= 0 ; n< N ;  n++)  // idx =1
+    	{ 
+    	//fih hena casting ha y7sl momkn y2sr 3al output                                 
+            result += testarray[n] * coeff[ -n+N-1 ] * 255 ; //bamshy el coeff bmen el a5r lel awl
     	}		
-    result = (result>>8) ; // take Higher 8 bits i.e shifting to right , 
+    result = (result>>8); // take Higher 8 bits i.e shifting to right , 
 	DAC_port= result;
 }   
 // void filter(int x)  // x is the input from adc
@@ -125,7 +118,6 @@ void Filter(int x)
 
 void read_adc() //Function to drive ADC
 {
-    ADC_value=0;
     ALE=1;
     START=1;
     delay(1);
@@ -159,7 +151,6 @@ void main()
     while(1)
     {
         adc();
-        ADC_value=0;
     }
     
 }
