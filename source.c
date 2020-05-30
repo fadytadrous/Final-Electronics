@@ -99,14 +99,13 @@ void read_adc() //Function to drive ADC
 {
     ALE=1;
     START=1;
-    delay(1);
     ALE=0;
     START=0;
     while(EOC==1);
     while(EOC==0);
     OE=1;
-    filter(Adc_Data);  // or ------> filter(Adc_Data); // I think this is a little bit faster , we will save variable assignment operation 
-    delay(1);
+   // filter(Adc_Data);  // or ------> filter(Adc_Data); // I think this is a little bit faster , we will save variable assignment operation 
+		DAC_port = Adc_Data ;
     OE=0;
 }
 void adc() 
@@ -125,8 +124,8 @@ void main()
     ALE=0;
     OE=0;
     START=0;
+		
     IE=0x82;
-    TR0=1;
     while(1)
     {
         adc();
