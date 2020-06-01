@@ -24,14 +24,10 @@ Project File Date:  05/30/2020
 <h2>Output:</h2>
 Rebuild target 'Target 1'
 compiling source.c...
-linking...
-*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
-    SEGMENT: ?PR?_DELAY?SOURCE
-*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
-    SEGMENT: ?PR?_FILTER?SOURCE
-Program Size: data=46.0 xdata=0 code=1358
-creating hex file from ".\Objects\projectKeil"...
-".\Objects\projectKeil" - 0 Error(s), 2 Warning(s).
+source.c(93): error C141: syntax error near 'float', expected '__asm'
+source.c(93): error C141: syntax error near '}', expected ';'
+source.c(130): error C202: 'coeff': undefined identifier
+Target not created.
 Build Time Elapsed:  00:00:00
 </pre>
 </body>

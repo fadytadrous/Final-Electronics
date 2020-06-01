@@ -1,4 +1,4 @@
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    05/30/2020  19:20:04  PAGE 1
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    06/01/2020  15:08:17  PAGE 1
 
 
 BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
@@ -16,6 +16,7 @@ INPUT MODULES INCLUDED:
   C:\KEIL_V5\C51\LIB\C51FPS.LIB (?C?CASTF)
   C:\KEIL_V5\C51\LIB\C51FPS.LIB (?C?FPGETOPN)
   C:\KEIL_V5\C51\LIB\C51S.LIB (?C_STARTUP)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?COPY)
   C:\KEIL_V5\C51\LIB\C51S.LIB (?C?UIDIV)
   C:\KEIL_V5\C51\LIB\C51S.LIB (?C?LNEG)
   C:\KEIL_V5\C51\LIB\C51S.LIB (?C?LLDIDATA0)
@@ -30,42 +31,53 @@ LINK MAP OF MODULE:  .\Objects\projectKeil (SOURCE)
 
             * * * * * * *   D A T A   M E M O R Y   * * * * * * *
             REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
-            DATA    0008H     0022H     UNIT         ?DT?SOURCE
-            DATA    002AH     0003H     UNIT         ?DT?_FILTER?SOURCE
-            IDATA   002DH     0001H     UNIT         ?STACK
+            DATA    0008H     002DH     UNIT         _DATA_GROUP_
+            DATA    0035H     001DH     UNIT         ?DT?SOURCE
+            IDATA   0052H     0001H     UNIT         ?STACK
 
             * * * * * * *   C O D E   M E M O R Y   * * * * * * *
             CODE    0000H     0003H     ABSOLUTE     
                     0003H     07FDH                  *** GAP ***
-            CODE    0800H     032DH     UNIT         ?C?LIB_CODE
-            CODE    0B2DH     0115H     UNIT         ?PR?_FILTER?SOURCE
-            CODE    0C42H     008CH     UNIT         ?C_C51STARTUP
-            CODE    0CCEH     002FH     UNIT         ?C_INITSEG
-            CODE    0CFDH     001CH     UNIT         ?PR?_DELAY?SOURCE
-            CODE    0D19H     0016H     UNIT         ?PR?READ_ADC?SOURCE
-            CODE    0D2FH     0013H     UNIT         ?PR?MAIN?SOURCE
-            CODE    0D42H     0009H     UNIT         ?PR?ADC?SOURCE
+            CODE    0800H     0423H     UNIT         ?C?LIB_CODE
+            CODE    0C23H     0115H     UNIT         ?PR?_FILTER?SOURCE
+            CODE    0D38H     008CH     UNIT         ?C_C51STARTUP
+            CODE    0DC4H     0084H     UNIT         ?CO?SOURCE
+            CODE    0E48H     0060H     UNIT         ?PR?MAIN?SOURCE
+            CODE    0EA8H     0028H     UNIT         ?C_INITSEG
+            CODE    0ED0H     001AH     UNIT         ?PR?READ_ADC?SOURCE
+            CODE    0EEAH     0009H     UNIT         ?PR?ADC?SOURCE
 
 
 
 OVERLAY MAP OF MODULE:   .\Objects\projectKeil (SOURCE)
 
 
-SEGMENT
-  +--> CALLED SEGMENT
----------------------
-?C_C51STARTUP
+SEGMENT                          DATA_GROUP 
+  +--> CALLED SEGMENT          START    LENGTH
+----------------------------------------------
+?C_C51STARTUP                  -----    -----
   +--> ?PR?MAIN?SOURCE
   +--> ?C_INITSEG
 
-?PR?MAIN?SOURCE
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  05/30/2020  19:20:04  PAGE 2
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/01/2020  15:08:17  PAGE 2
 
 
+?PR?MAIN?SOURCE                0008H    002CH
+  +--> ?CO?SOURCE
   +--> ?PR?ADC?SOURCE
 
-?PR?ADC?SOURCE
+?PR?ADC?SOURCE                 -----    -----
   +--> ?PR?READ_ADC?SOURCE
+
+?PR?READ_ADC?SOURCE            -----    -----
+  +--> ?PR?_FILTER?SOURCE
+
+?PR?_FILTER?SOURCE             0034H    0001H
+
+
+
+UNRESOLVED EXTERNAL SYMBOLS:
+   COEFF
 
 
 
@@ -77,113 +89,129 @@ SYMBOL TABLE OF MODULE:  .\Objects\projectKeil (SOURCE)
   -------         MODULE        SOURCE
   C:0000H         SYMBOL        _ICE_DUMMY_
   D:0080H         PUBLIC        P0
+  D:0090H         PUBLIC        P1
   D:00A0H         PUBLIC        P2
   D:00B0H         PUBLIC        P3
-  D:0008H         PUBLIC        coeff
-  C:0B2DH         PUBLIC        _filter
+  C:0C23H         PUBLIC        _filter
   B:0080H.0       PUBLIC        ADDA
   B:0080H.1       PUBLIC        ADDB
   B:0080H.2       PUBLIC        ADDC
   D:00A8H         PUBLIC        IE
   B:0080H.5       PUBLIC        START
-  C:0CFDH         PUBLIC        _delay
   B:0080H.7       PUBLIC        OE
-  D:001CH         PUBLIC        oldest_input
-  C:0D2FH         PUBLIC        main
-  C:0D19H         PUBLIC        read_adc
-  C:0D42H         PUBLIC        adc
-  D:001DH         PUBLIC        full
-  D:001EH         PUBLIC        last_input
-  D:001FH         PUBLIC        N
+  D:0035H         PUBLIC        oldest_input
+  D:0036H         PUBLIC        result
+  C:0E48H         PUBLIC        main
+  C:0ED0H         PUBLIC        read_adc
+  C:0EEAH         PUBLIC        adc
+  D:0038H         PUBLIC        full
+  C:0DC4H         SYMBOL        _?ix1000
+  C:0DF0H         SYMBOL        _?ix1001
+  C:0E1CH         SYMBOL        _?ix1002
+  D:0039H         PUBLIC        last_input
+  D:003AH         PUBLIC        N
   B:0080H.4       PUBLIC        ALE
+  B:0088H.4       PUBLIC        TR0
   B:0080H.6       PUBLIC        EOC
-  D:0020H         PUBLIC        z
-  -------         PROC          _DELAY
-  D:0006H         SYMBOL        count
-  -------         DO            
-  D:0005H         SYMBOL        i
-  D:0004H         SYMBOL        j
-  -------         ENDDO         
-  C:0CFDH         LINE#         24
-  C:0CFDH         LINE#         25
-  C:0CFDH         LINE#         27
-  C:0D06H         LINE#         28
-  C:0D18H         LINE#         29
-  -------         ENDPROC       _DELAY
+  D:003BH         PUBLIC        x
+  D:003CH         PUBLIC        z
   -------         PROC          _FILTER
   D:0006H         SYMBOL        x
   -------         DO            
-  D:002AH         SYMBOL        n
-  D:002BH         SYMBOL        result
+  D:0034H         SYMBOL        n
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/01/2020  15:08:17  PAGE 3
+
+
   -------         ENDDO         
-  C:0B2DH         LINE#         57
-  C:0B2DH         LINE#         58
-  C:0B2DH         LINE#         60
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  05/30/2020  19:20:04  PAGE 3
-
-
-  C:0B32H         LINE#         63
-  C:0B3EH         LINE#         64
-  C:0B4FH         LINE#         66
-  C:0B53H         LINE#         67
-  C:0B53H         LINE#         68
-  C:0B56H         LINE#         69
-  C:0B56H         LINE#         71
-  C:0B5AH         LINE#         72
-  C:0B5AH         LINE#         73
-  C:0B66H         LINE#         74
-  C:0B66H         LINE#         75
-  C:0BB5H         LINE#         76
-  C:0BB9H         LINE#         77
-  C:0BB9H         LINE#         80
-  C:0BB9H         LINE#         82
-  C:0BC3H         LINE#         83
-  C:0BC3H         LINE#         84
-  C:0C20H         LINE#         89
-  C:0C24H         LINE#         90
-  C:0C35H         LINE#         92
-  C:0C35H         LINE#         94
-  C:0C3EH         LINE#         95
-  C:0C41H         LINE#         96
+  C:0C23H         LINE#         29
+  C:0C23H         LINE#         30
+  C:0C23H         LINE#         32
+  C:0C28H         LINE#         35
+  C:0C34H         LINE#         36
+  C:0C45H         LINE#         38
+  C:0C49H         LINE#         39
+  C:0C49H         LINE#         40
+  C:0C4CH         LINE#         41
+  C:0C4CH         LINE#         43
+  C:0C50H         LINE#         44
+  C:0C50H         LINE#         45
+  C:0C5CH         LINE#         46
+  C:0C5CH         LINE#         47
+  C:0CABH         LINE#         48
+  C:0CAFH         LINE#         49
+  C:0CAFH         LINE#         52
+  C:0CAFH         LINE#         54
+  C:0CB9H         LINE#         55
+  C:0CB9H         LINE#         56
+  C:0D16H         LINE#         58
+  C:0D1AH         LINE#         59
+  C:0D2BH         LINE#         61
+  C:0D2BH         LINE#         63
+  C:0D34H         LINE#         64
+  C:0D37H         LINE#         65
   -------         ENDPROC       _FILTER
   -------         PROC          READ_ADC
-  C:0D19H         LINE#         98
-  C:0D19H         LINE#         99
-  C:0D19H         LINE#         100
-  C:0D1BH         LINE#         101
-  C:0D1DH         LINE#         102
-  C:0D1FH         LINE#         103
-  C:0D21H         LINE#         104
-  C:0D24H         LINE#         105
-  C:0D27H         LINE#         106
-  C:0D29H         LINE#         108
-  C:0D2CH         LINE#         109
-  C:0D2EH         LINE#         110
+  C:0ED0H         LINE#         67
+  C:0ED0H         LINE#         68
+  C:0ED0H         LINE#         69
+  C:0ED2H         LINE#         70
+  C:0ED4H         LINE#         71
+  C:0ED6H         LINE#         72
+  C:0ED8H         LINE#         73
+  C:0EDBH         LINE#         74
+  C:0EDEH         LINE#         75
+  C:0EE0H         LINE#         76
+  C:0EE7H         LINE#         77
+  C:0EE9H         LINE#         78
   -------         ENDPROC       READ_ADC
   -------         PROC          ADC
-  C:0D42H         LINE#         111
-  C:0D42H         LINE#         112
-  C:0D42H         LINE#         113
-  C:0D44H         LINE#         114
-  C:0D46H         LINE#         115
-  C:0D48H         LINE#         116
+  C:0EEAH         LINE#         79
+  C:0EEAH         LINE#         80
+  C:0EEAH         LINE#         81
+  C:0EECH         LINE#         82
+  C:0EEEH         LINE#         83
+  C:0EF0H         LINE#         84
   -------         ENDPROC       ADC
   -------         PROC          MAIN
-  C:0D2FH         LINE#         120
-  C:0D2FH         LINE#         121
-  C:0D2FH         LINE#         122
-  C:0D32H         LINE#         123
-  C:0D34H         LINE#         124
-  C:0D36H         LINE#         125
-  C:0D38H         LINE#         126
-  C:0D3AH         LINE#         128
-  C:0D3DH         LINE#         129
-  C:0D3DH         LINE#         130
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  05/30/2020  19:20:04  PAGE 4
+  -------         DO            
+  D:0008H         SYMBOL        coeff
+  D:0008H         SYMBOL        coeff
+  D:0008H         SYMBOL        coeff
+  -------         ENDDO         
+  -------         DO            
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/01/2020  15:08:17  PAGE 4
 
 
-  C:0D3DH         LINE#         131
-  C:0D40H         LINE#         132
+  D:0008H         SYMBOL        coeff
+  D:0008H         SYMBOL        coeff
+  -------         ENDDO         
+  -------         DO            
+  D:0008H         SYMBOL        coeff
+  -------         ENDDO         
+  C:0E48H         LINE#         88
+  C:0E48H         LINE#         89
+  C:0E48H         LINE#         90
+  C:0E4BH         LINE#         91
+  C:0E4EH         LINE#         93
+  C:0E55H         LINE#         94
+  C:0E55H         LINE#         95
+  C:0E66H         LINE#         96
+  C:0E66H         LINE#         97
+  C:0E6DH         LINE#         98
+  C:0E7EH         LINE#         109
+  C:0E7EH         LINE#         110
+  C:0E85H         LINE#         111
+  C:0E96H         LINE#         122
+  C:0E96H         LINE#         124
+  C:0E98H         LINE#         125
+  C:0E9AH         LINE#         126
+  C:0E9CH         LINE#         127
+  C:0E9EH         LINE#         128
+  C:0EA1H         LINE#         129
+  C:0EA3H         LINE#         130
+  C:0EA3H         LINE#         131
+  C:0EA3H         LINE#         132
+  C:0EA6H         LINE#         133
   -------         ENDPROC       MAIN
   -------         ENDMOD        SOURCE
 
@@ -206,27 +234,42 @@ SYMBOL TABLE OF MODULE:  .\Objects\projectKeil (SOURCE)
   C:0A3CH         PUBLIC        ?C?CASTF
   -------         ENDMOD        ?C?CASTF
 
+  -------         MODULE        ?C?COPY
+  C:0B8DH         PUBLIC        ?C?COPY
+  -------         ENDMOD        ?C?COPY
+
   -------         MODULE        ?C?UIDIV
-  C:0ABDH         PUBLIC        ?C?UIDIV
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/01/2020  15:08:17  PAGE 5
+
+
+  C:0BB3H         PUBLIC        ?C?UIDIV
   -------         ENDMOD        ?C?UIDIV
 
   -------         MODULE        ?C?LNEG
-  C:0B12H         PUBLIC        ?C?LNEG
+  C:0C08H         PUBLIC        ?C?LNEG
   -------         ENDMOD        ?C?LNEG
 
   -------         MODULE        ?C?LLDIDATA0
-  C:0B20H         PUBLIC        ?C?LLDIDATA0
+  C:0C16H         PUBLIC        ?C?LLDIDATA0
   -------         ENDMOD        ?C?LLDIDATA0
 
-*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
-    SEGMENT: ?PR?_DELAY?SOURCE
+*** WARNING L1: UNRESOLVED EXTERNAL SYMBOL
+    SYMBOL:  COEFF
+    MODULE:  .\Objects\source.obj (SOURCE)
 
-*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
-    SEGMENT: ?PR?_FILTER?SOURCE
+*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
+    SYMBOL:  COEFF
+    MODULE:  .\Objects\source.obj (SOURCE)
+    ADDRESS: 0C77H
+
+*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
+    SYMBOL:  COEFF
+    MODULE:  .\Objects\source.obj (SOURCE)
+    ADDRESS: 0CE2H
 
 ******************************************************************************
-* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 0191H BYTE (19%) *
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 0243H BYTE (28%) *
 ******************************************************************************
 
-Program Size: data=46.0 xdata=0 code=1358
-LINK/LOCATE RUN COMPLETE.  2 WARNING(S),  0 ERROR(S)
+Program Size: data=83.0 xdata=0 code=1782
+LINK/LOCATE RUN COMPLETE.  3 WARNING(S),  0 ERROR(S)

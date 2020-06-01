@@ -10,72 +10,22 @@ sbit ADDB=P0^1;
 sbit ADDC=P0^2;
 #define Adc_Data P2  //ADC
 #define DAC_port P3  //DAC
-unsigned char x=1; // edit to test amfrod ne3ml switch fel proteus ye8yr el X
-if (x=0){ //low pass 150hz
-	float coeff[10]= {0.25,
-	-0.0002,
-	0.0001,
-	0.00008,
-	0.00002,
-	0.00002,
-	0.00008,
-	0.0001,
-	-0.0002,
-	0.25};
-}
-if (x=1){ //high pass at 10hz
-	float coeff[10]= {0.0508,
-	0.107,
-	0.134,
-	0.216,
-	0.637,
-	-0.637,
-	-0.216,
-	-0.134,
-	-0.107,
-	-0.0508
-	};
+#define state P1
+unsigned char x=1;
 
-}
 
  int result;
 //filtration constants
-unsigned char N = 10;
+unsigned char N = 11;
 unsigned char last_input = 0;		// initial state flag
 unsigned char oldest_input = 0;
 unsigned char full = 0;
-int z[10]={0};
+int z[11]={0};
 
 //target is lowpass 150hz, high pass 1hz,notch filter at 50hz
 
 
-// void Filter(int x)
-// {
-// 	static const unsigned char N = 5 ;
-// 	unsigned char n;
-// 	int result=0; 
-// 	if(i<N)
-// 	{
-// 		testarray[i]= x;  
-// 		i++;
-// 	}
-// 	else{
-// 		for ( n = 0; n < (N-1); n++)
-// 		{
-// 			testarray[n] = testarray[n+1]; //shift w 7otkol value fi ely ganbha
-// 		}
-// 		testarray[N-1] = x;
-// 	}
-// 	for (n= 0 ; n< N ;  n++)  // idx =1
-//     	{ 
-//     	//fih hena casting ha y7sl momkn y2sr 3al output                                 
-//             result += testarray[n] * coeff[ -n+N-1 ] * 255 ; //bamshy el coeff bmen el a5r lel awl
-//     	}		
-//     result = (result>>8); // take Higher 8 bits i.e shifting to right , 
-// 	DAC_port= result;
-// }   
-
-void filter (int x)			// x is the input from adc
+void filter (int x,float coeff[])			// x is the input from adc
 {
   unsigned char n;
   result = 0;
@@ -103,10 +53,7 @@ void filter (int x)			// x is the input from adc
       for (n = 0; n < N; n++)	// idx =1
 		{
        	result += z[(oldest_input + n) % N] * coeff[-n+N-1] * 255;  
-	  // result = z[(oldest_input + n) % N];	// for just debugging
-	  // printf ("current input is  %d  ", x);
-	  // printf ("%d  %d \t", n, result);
-	  // printf ("\n");
+	  
 		}
       oldest_input = (last_input + 1) % N;
 
@@ -116,7 +63,7 @@ void filter (int x)			// x is the input from adc
 	DAC_port= result;
 }
 
-void read_adc() //Function to drive ADC
+void read_adc(float coeff[]) //Function to drive ADC
 {
     ALE=1;
     START=1;
@@ -125,21 +72,53 @@ void read_adc() //Function to drive ADC
     while(EOC==1);
     while(EOC==0);
     OE=1;
- 	filter(Adc_Data);
+ 	filter(Adc_Data,coeff);
     OE=0;
 }
-void adc() 
+void adc(float coeff[]) 
 {
     ADDC=0; // Selecting input channel IN0 using address lines
     ADDB=0;
     ADDA=0;
-    read_adc();
+    read_adc(coeff);
 }
 
 
 void main()
 {	
 	Adc_Data = 0xFF ;
+	state =0xFF ;
+
+ // low at 2khz
+float coeff[]={0.000763, 0.005268, 0.014201, 0.025856, 0.035975, 0.040000, 0.035975, 0.025856, 0.014201, 0.005268, 0.000763};	
+
+if (state == 8 ){ // notch at 5000hz
+float coeff[]={-0.000001, 
+-0.000088, 
+-0.000433, 
+-0.001062, 
+-0.001717, 
+0.998000, 
+-0.001717, 
+-0.001062, 
+-0.000433, 
+-0.000088, 
+-0.000001};	
+}
+if (state == 16 ){ // high at 2khz
+float coeff[]={0.000763, 
+0.005268, 
+0.014201, 
+0.025856, 
+0.035975, 
+0.040000, 
+0.035975, 
+0.025856, 
+0.014201, 
+0.005268, 
+0.000763};	
+}
+
     EOC=1;
     ALE=0;
     OE=0;
@@ -148,7 +127,7 @@ void main()
     TR0=1;
     while(1)
     {
-        adc();
+        adc(coeff);
     }
     
 }
