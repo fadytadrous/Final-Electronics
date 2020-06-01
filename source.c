@@ -10,23 +10,44 @@ sbit ADDB=P0^1;
 sbit ADDC=P0^2;
 #define Adc_Data P2  //ADC
 #define DAC_port P3  //DAC
+unsigned char x=1; // edit to test amfrod ne3ml switch fel proteus ye8yr el X
+if (x=0){ //low pass 150hz
+	float coeff[10]= {0.25,
+	-0.0002,
+	0.0001,
+	0.00008,
+	0.00002,
+	0.00002,
+	0.00008,
+	0.0001,
+	-0.0002,
+	0.25};
+}
+if (x=1){ //high pass at 10hz
+	float coeff[10]= {0.0508,
+	0.107,
+	0.134,
+	0.216,
+	0.637,
+	-0.637,
+	-0.216,
+	-0.134,
+	-0.107,
+	-0.0508
+	};
 
+}
+
+ int result;
 //filtration constants
-unsigned char N = 5;
+unsigned char N = 10;
 unsigned char last_input = 0;		// initial state flag
 unsigned char oldest_input = 0;
 unsigned char full = 0;
-int z[5]={0};
+int z[10]={0};
 
 //target is lowpass 150hz, high pass 1hz,notch filter at 50hz
-float coeff[5]= {0.2397,0.02625,0.02704,0.02785,0.02837}; 
 
-void delay(unsigned int count) 
-{
-    unsigned char i,j;
-    for(i=0;i<count;i++)
-    for(j=0;j<100;j++);
-}
 
 // void Filter(int x)
 // {
@@ -57,7 +78,7 @@ void delay(unsigned int count)
 void filter (int x)			// x is the input from adc
 {
   unsigned char n;
-  int result = 0;
+  result = 0;
 
 
   z[last_input] = x;
@@ -104,8 +125,7 @@ void read_adc() //Function to drive ADC
     while(EOC==1);
     while(EOC==0);
     OE=1;
-   // filter(Adc_Data);  // or ------> filter(Adc_Data); // I think this is a little bit faster , we will save variable assignment operation 
-		DAC_port = Adc_Data ;
+ 	filter(Adc_Data);
     OE=0;
 }
 void adc() 
@@ -124,8 +144,8 @@ void main()
     ALE=0;
     OE=0;
     START=0;
-		
     IE=0x82;
+    TR0=1;
     while(1)
     {
         adc();
