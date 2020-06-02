@@ -12,10 +12,35 @@ sbit ADDC=P0^2;
 #define DAC_port P3  //DAC
 #define state P1
 unsigned char x=1;
-
+	// low at 2khz
+ // float coeff[]={0.000763, 0.005268, 0.014201, 0.025856, 0.035975, 0.040000, 0.035975, 0.025856, 0.014201, 0.005268, 0.000763};	
+//notch at 5k
+//  float coeff[]={-0.000001, 
+// -0.000088, 
+// -0.000433, 
+// -0.001062, 
+// -0.001717, 
+// 0.998000, 
+// -0.001717, 
+// -0.001062, 
+// -0.000433, 
+// -0.000088, 
+// -0.000001};	
+// high at 2khz
+float coeff[]={-0.000763, 
+-0.005268, 
+-0.014201, 
+-0.025856, 
+-0.035975, 
+0.960000, 
+-0.035975, 
+-0.025856, 
+-0.014201, 
+-0.005268, 
+-0.000763};	
 
  int result;
-//filtration constants
+//filtr function constants
 unsigned char N = 11;
 unsigned char last_input = 0;		// initial state flag
 unsigned char oldest_input = 0;
@@ -25,12 +50,10 @@ int z[11]={0};
 //target is lowpass 150hz, high pass 1hz,notch filter at 50hz
 
 
-void filter (int x,float coeff[])			// x is the input from adc
+void filter (int x)			// x is the input from adc
 {
   unsigned char n;
   result = 0;
-
-
   z[last_input] = x;
   last_input = (last_input + 1) % N;
 
@@ -63,7 +86,7 @@ void filter (int x,float coeff[])			// x is the input from adc
 	DAC_port= result;
 }
 
-void read_adc(float coeff[]) //Function to drive ADC
+void read_adc() //Function to drive ADC
 {
     ALE=1;
     START=1;
@@ -72,53 +95,22 @@ void read_adc(float coeff[]) //Function to drive ADC
     while(EOC==1);
     while(EOC==0);
     OE=1;
- 	filter(Adc_Data,coeff);
+ 	filter(Adc_Data);
+ 	// DAC_port=Adc_Data;
     OE=0;
 }
-void adc(float coeff[]) 
+void adc() 
 {
     ADDC=0; // Selecting input channel IN0 using address lines
     ADDB=0;
     ADDA=0;
-    read_adc(coeff);
+    read_adc();
 }
-
 
 void main()
 {	
 	Adc_Data = 0xFF ;
 	state =0xFF ;
-
- // low at 2khz
-float coeff[]={0.000763, 0.005268, 0.014201, 0.025856, 0.035975, 0.040000, 0.035975, 0.025856, 0.014201, 0.005268, 0.000763};	
-
-if (state == 8 ){ // notch at 5000hz
-float coeff[]={-0.000001, 
--0.000088, 
--0.000433, 
--0.001062, 
--0.001717, 
-0.998000, 
--0.001717, 
--0.001062, 
--0.000433, 
--0.000088, 
--0.000001};	
-}
-if (state == 16 ){ // high at 2khz
-float coeff[]={0.000763, 
-0.005268, 
-0.014201, 
-0.025856, 
-0.035975, 
-0.040000, 
-0.035975, 
-0.025856, 
-0.014201, 
-0.005268, 
-0.000763};	
-}
-
     EOC=1;
     ALE=0;
     OE=0;
@@ -127,7 +119,7 @@ float coeff[]={0.000763,
     TR0=1;
     while(1)
     {
-        adc(coeff);
+        adc();
     }
     
 }
